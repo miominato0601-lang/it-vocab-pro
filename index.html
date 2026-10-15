@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IT Vocab Pro — Nền tảng học từ vựng tiếng Anh IT</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- React & ReactDOM & Babel CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="h-full text-slate-800 antialiased selection:bg-blue-500 selection:text-white">
+  <div id="root" class="h-full"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // --- 40 TỪ VỰNG CHUYÊN NGÀNH IT CHUẨN B1-B2 ---
+    const INITIAL_VOCAB = [
+      { id: 'w1-01', word: 'Deploy', partOfSpeech: 'verb', ipa: '/dɪˈplɔɪ/', meaningVi: 'Triển khai (phần mềm lên production)', definitionEn: 'To bring software into action in a production environment.', exampleEn: 'We plan to deploy the new authentication service tonight.', exampleVi: 'Chúng tôi dự định triển khai dịch vụ xác thực mới tối nay.', topic: 'Software Development', difficulty: 'Intermediate', week: 1 },
+      { id: 'w1-02', word: 'Refactor', partOfSpeech: 'verb', ipa: '/ˌriːˈfæktər/', meaningVi: 'Tái cấu trúc mã nguồn', definitionEn: 'To restructure existing code without changing external behavior.', exampleEn: 'I need to refactor this legacy module.', exampleVi: 'Tôi cần tái cấu trúc module cũ này.', topic: 'Software Development', difficulty: 'Intermediate', week: 1 },
+      { id: 'w1-03', word: 'Scalability', partOfSpeech: 'noun', ipa: '/ˌskeɪləˈbɪləti/', meaningVi: 'Khả năng mở rộng hệ thống', definitionEn: 'The capacity of a system to handle a growing workload.', exampleEn: 'Microservices enhance our system scalability.', exampleVi: 'Microservices nâng cao khả năng mở rộng hệ thống.', topic: 'Software Development', difficulty: 'Intermediate', week: 1 },
+      { id: 'w1-04', word: 'Bottleneck', partOfSpeech: 'noun', ipa: '/ˈbɑːtlnek/', meaningVi: 'Nút thắt cổ chai hiệu năng', definitionEn: 'A point of congestion in a system workflow.', exampleEn: 'Database queries are the main bottleneck here.', exampleVi: 'Truy vấn cơ sở dữ liệu là nút thắt chính ở đây.', topic: 'Software Development', difficulty: 'Intermediate', week: 1 },
+      { id: 'w1-05', word: 'Boilerplate', partOfSpeech: 'noun', ipa: '/ˈbɔɪlərlpleɪt/', meaningVi: 'Mã nguồn mẫu lặp lại', definitionEn: 'Sections of code that must be included with little alteration.', exampleEn: 'Modern frameworks reduce boilerplate code.', exampleVi: 'Các framework hiện đại giảm bớt code mẫu lặp lại.', topic: 'Software Development', difficulty: 'Intermediate', week: 1 },
+      { id: 'w1-06', word: 'Deprecate', partOfSpeech: 'verb', ipa: '/ˈdeprəkeɪt/', meaningVi: 'Khuyến cáo không dùng nữa', definitionEn: 'To recommend against using a software feature.', exampleEn: 'We will deprecate v1 of the public API.', exampleVi: 'Chúng tôi sẽ ngừng hỗ trợ v1 của API công khai.', topic: 'Software Development', difficulty: 'Intermediate', week: 1 },
+      { id: 'w1-07', word: 'Implement', partOfSpeech: 'verb', ipa: '/ˈɪmplɪment/', meaningVi: 'Thực thi, triển khai tính năng', definitionEn: 'To put a plan or feature into effect.', exampleEn: 'The team will implement OAuth2 authentication.', exampleVi: 'Nhóm sẽ triển khai tính năng xác thực OAuth2.', topic: 'Software Development', difficulty: 'Beginner', week: 1 },
+      { id: 'w1-08', word: 'Robust', partOfSpeech: 'adjective', ipa: '/roʊˈbʌst/', meaningVi: 'Vững chắc, ổn định', definitionEn: 'Strong and effective against errors.', exampleEn: 'We need a robust error-handling mechanism.', exampleVi: 'Chúng ta cần cơ chế xử lý lỗi vững chắc.', topic: 'Software Development', difficulty: 'Intermediate', week: 1 },
+      { id: 'w1-09', word: 'Redundancy', partOfSpeech: 'noun', ipa: '/rɪˈdʌndənsi/', meaningVi: 'Tính dự phòng hệ thống', definitionEn: 'Inclusion of extra components to ensure reliability.', exampleEn: 'Server redundancy ensures high availability.', exampleVi: 'Tính dự phòng server đảm bảo độ sẵn sàng cao.', topic: 'Software Development', difficulty: 'Intermediate', week: 1 },
+      { id: 'w1-10', word: 'Seamless', partOfSpeech: 'adjective', ipa: '/ˈsiːmləs/', meaningVi: 'Liền mạch, mượt mà', definitionEn: 'Smooth and continuous without gaps.', exampleEn: 'We aim for a seamless user experience.', exampleVi: 'Chúng tôi hướng đến trải nghiệm người dùng liền mạch.', topic: 'Software Development', difficulty: 'Intermediate', week: 1 },
+
+      // Tuần 2
+      { id: 'w2-01', word: 'Debug', partOfSpeech: 'verb', ipa: '/diːˈbʌɡ/', meaningVi: 'Gỡ lỗi phần mềm', definitionEn: 'To identify and remove errors from code.', exampleEn: 'She spent hours debugging the async race condition.', exampleVi: 'Cô ấy mất hàng giờ gỡ lỗi tranh chấp bất đồng bộ.', topic: 'Programming and Debugging', difficulty: 'Beginner', week: 2 },
+      { id: 'w2-02', word: 'Reproduce', partOfSpeech: 'verb', ipa: '/ˌriːprəˈduːs/', meaningVi: 'Tái hiện lại lỗi', definitionEn: 'To cause a bug to happen again.', exampleEn: 'Can you provide steps to reproduce the crash?', exampleVi: 'Bạn có thể cung cấp các bước tái hiện lỗi crash không?', topic: 'Programming and Debugging', difficulty: 'Intermediate', week: 2 },
+      { id: 'w2-03', word: 'Workaround', partOfSpeech: 'noun', ipa: '/ˈwɜːrkəraʊnd/', meaningVi: 'Giải pháp tạm thời tránh lỗi', definitionEn: 'A temporary fix for a system problem.', exampleEn: 'Here is a quick workaround until the patch arrives.', exampleVi: 'Đây là giải pháp tạm thời cho đến khi có bản vá.', topic: 'Programming and Debugging', difficulty: 'Intermediate', week: 2 },
+      { id: 'w2-04', word: 'Traceback', partOfSpeech: 'noun', ipa: '/ˈtreɪsbæk/', meaningVi: 'Bản vết lời gọi hàm lỗi', definitionEn: 'A report of active stack frames during an exception.', exampleEn: 'Check the traceback to locate the exact error line.', exampleVi: 'Kiểm tra bản vết lỗi để định vị chính xác dòng code.', topic: 'Programming and Debugging', difficulty: 'Intermediate', week: 2 },
+      { id: 'w2-05', word: 'Concurrency', partOfSpeech: 'noun', ipa: '/kənˈkɜːrənsi/', meaningVi: 'Tính đồng thời', definitionEn: 'Ability to execute multiple tasks overlapping in time.', exampleEn: 'Go language is famous for concurrency support.', exampleVi: 'Ngôn ngữ Go nổi tiếng về hỗ trợ tính đồng thời.', topic: 'Programming and Debugging', difficulty: 'Advanced', week: 2 },
+      { id: 'w2-06', word: 'Pull Request', phrase: 'PR', partOfSpeech: 'noun', ipa: '/pʊl rɪˈkwest/', meaningVi: 'Yêu cầu trộn code trong Git', definitionEn: 'A proposal to merge branch changes.', exampleEn: 'Please review my pull request before merging.', exampleVi: 'Vui lòng review pull request trước khi merge.', topic: 'Project Management', difficulty: 'Beginner', week: 2 },
+      { id: 'w2-07', word: 'Merge Conflict', partOfSpeech: 'noun', ipa: '/mɜːrdʒ ˈkɑːnflɪkt/', meaningVi: 'Xung đột khi trộn code', definitionEn: 'An event when Git cannot automatically resolve differences.', exampleEn: 'I ran into a merge conflict on main branch.', exampleVi: 'Tôi gặp xung đột trộn code trên nhánh main.', topic: 'Programming and Debugging', difficulty: 'Intermediate', week: 2 },
+      { id: 'w2-08', word: 'Sprint', partOfSpeech: 'noun', ipa: '/sprɪnt/', meaningVi: 'Chu kỳ làm việc ngắn hạn', definitionEn: 'A set period to complete specific work.', exampleEn: 'Our current sprint focuses on security hardening.', exampleVi: 'Sprint hiện tại tập trung tăng cường bảo mật.', topic: 'Project Management', difficulty: 'Beginner', week: 2 },
+      { id: 'w2-09', word: 'Blocker', partOfSpeech: 'noun', ipa: '/ˈblɑːkər/', meaningVi: 'Vấn đề chặn tiến độ', definitionEn: 'An issue preventing progress on a task.', exampleEn: 'Do you have any blockers in today standup?', exampleVi: 'Bạn có gặp blocker nào trong buổi standup hôm nay không?', topic: 'Project Management', difficulty: 'Beginner', week: 2 },
+      { id: 'w2-10', word: 'Retrospective', partOfSpeech: 'noun', ipa: '/ˌretrəˈspektɪv/', meaningVi: 'Buổi họp tổng kết rút kinh nghiệm', definitionEn: 'A meeting held at the end of a sprint.', exampleEn: 'We discussed team velocity in the retro.', exampleVi: 'Chúng ta thảo luận vận tốc đội ngũ trong buổi retro.', topic: 'Project Management', difficulty: 'Intermediate', week: 2 },
+
+      // Tuần 3
+      { id: 'w3-01', word: 'Endpoint', partOfSpeech: 'noun', ipa: '/ˈendpɔɪnt/', meaningVi: 'Điểm cuối API', definitionEn: 'A specific URL where an API accesses resources.', exampleEn: 'The payment gateway exposes a secure REST endpoint.', exampleVi: 'Cổng thanh toán cung cấp một REST endpoint bảo mật.', topic: 'APIs and Integration', difficulty: 'Intermediate', week: 3 },
+      { id: 'w3-02', word: 'Payload', partOfSpeech: 'noun', ipa: '/ˈpeɪloʊd/', meaningVi: 'Dữ liệu chuyên chở trong gói tin', definitionEn: 'The actual data sent in an HTTP request.', exampleEn: 'Ensure the JSON payload contains required fields.', exampleVi: 'Đảm bảo payload JSON chứa đầy đủ các trường yêu cầu.', topic: 'APIs and Integration', difficulty: 'Intermediate', week: 3 },
+      { id: 'w3-03', word: 'Idempotent', partOfSpeech: 'adjective', ipa: '/ˌaɪdəmˈpoʊtənt/', meaningVi: 'Tính lũy đẳng API', definitionEn: 'Operations that can be applied multiple times safely.', exampleEn: 'PUT methods should be designed idempotent.', exampleVi: 'Các phương thức PUT nên được thiết kế có tính lũy đẳng.', topic: 'APIs and Integration', difficulty: 'Advanced', week: 3 },
+      { id: 'w3-04', word: 'Latency', partOfSpeech: 'noun', ipa: '/ˈleɪtəsi/', meaningVi: 'Độ trễ mạng', definitionEn: 'The delay before data transfer begins.', exampleEn: 'We use CDN caching to reduce network latency.', exampleVi: 'Chúng tôi dùng CDN caching để giảm độ trễ mạng.', topic: 'APIs and Integration', difficulty: 'Intermediate', week: 3 },
+      { id: 'w3-05', word: 'Query', partOfSpeech: 'noun', ipa: '/ˈkwɪri/', meaningVi: 'Truy vấn cơ sở dữ liệu', definitionEn: 'A request for information from a database.', exampleEn: 'Optimize this SQL query to prevent full table scans.', exampleVi: 'Tối ưu truy vấn SQL này để tránh quét toàn bảng.', topic: 'Databases and Data', difficulty: 'Beginner', week: 3 },
+      { id: 'w3-06', word: 'Index', partOfSpeech: 'noun', ipa: '/ˈɪndeks/', meaningVi: 'Chỉ mục cơ sở dữ liệu', definitionEn: 'Data structure improving data retrieval speed.', exampleEn: 'Adding an index drastically improved search speed.', exampleVi: 'Thêm chỉ mục cải thiện tốc độ tìm kiếm đáng kể.', topic: 'Databases and Data', difficulty: 'Intermediate', week: 3 },
+      { id: 'w3-07', word: 'Migration', partOfSpeech: 'noun', ipa: '/maɪˈɡreɪʃn/', meaningVi: 'Di chuyển / cập nhật cấu trúc DB', definitionEn: 'Process of moving schema versions.', exampleEn: 'Run the database migration script before starting.', exampleVi: 'Chạy script migration database trước khi khởi động.', topic: 'Databases and Data', difficulty: 'Intermediate', week: 3 },
+      { id: 'w3-08', word: 'Containerization', partOfSpeech: 'noun', ipa: '/kənˌteɪnəraɪˈzeɪʃn/', meaningVi: 'Đóng gói container (Docker)', definitionEn: 'OS virtualization packaging apps and dependencies.', exampleEn: 'Containerization ensures environment consistency.', exampleVi: 'Đóng gói container đảm bảo sự nhất quán môi trường.', topic: 'Cloud Computing and DevOps', difficulty: 'Advanced', week: 3 },
+      { id: 'w3-09', word: 'Provision', partOfSpeech: 'verb', ipa: '/prəˈvɪʒn/', meaningVi: 'Cấp phát tài nguyên hạ tầng', definitionEn: 'To configure infrastructure resources.', exampleEn: 'Terraform provisions cloud infrastructure automatically.', exampleVi: 'Terraform cấp phát hạ tầng cloud tự động.', topic: 'Cloud Computing and DevOps', difficulty: 'Advanced', week: 3 },
+      { id: 'w3-10', word: 'Vulnerability', partOfSpeech: 'noun', ipa: '/ˌvʌlnərəˈbɪləti/', meaningVi: 'Lỗ hổng bảo mật', definitionEn: 'A weakness in an information system.', exampleEn: 'Security scan detected a critical vulnerability.', exampleVi: 'Quét bảo mật phát hiện lỗ hổng nghiêm trọng.', topic: 'Cybersecurity', difficulty: 'Intermediate', week: 3 },
+
+      // Tuần 4
+      { id: 'w4-01', word: 'Clarify', partOfSpeech: 'verb', ipa: '/ˈklærəfaɪ/', meaningVi: 'Làm rõ yêu cầu / ý kiến', definitionEn: 'To make something more comprehensible.', exampleEn: 'Could you clarify the acceptance criteria?', exampleVi: 'Bạn có thể làm rõ tiêu chí nghiệm thu được không?', topic: 'Technical Meetings', difficulty: 'Beginner', week: 4 },
+      { id: 'w4-02', word: 'Delegate', partOfSpeech: 'verb', ipa: '/ˈdelɪɡeɪt/', meaningVi: 'Ủy quyền, phân công việc', definitionEn: 'To entrust responsibility to someone else.', exampleEn: 'Delegate backend tasks among team members.', exampleVi: 'Phân công nhiệm vụ backend cho các thành viên.', topic: 'Project Management', difficulty: 'Intermediate', week: 4 },
+      { id: 'w4-03', word: 'Consensus', partOfSpeech: 'noun', ipa: '/kənˈsensəs/', meaningVi: 'Sự đồng thuận chung', definitionEn: 'A general agreement among group members.', exampleEn: 'We reached consensus to adopt GraphQL.', exampleVi: 'Chúng tôi đạt đồng thuận áp dụng GraphQL.', topic: 'Technical Meetings', difficulty: 'Intermediate', week: 4 },
+      { id: 'w4-04', word: 'Circulate', partOfSpeech: 'verb', ipa: '/ˈsɜːrkjəleɪt/', meaningVi: 'Phổ biến tài liệu, thông tin', definitionEn: 'To distribute information widely.', exampleEn: 'I will circulate meeting minutes via email.', exampleVi: 'Tôi sẽ gửi biên bản cuộc họp qua email.', topic: 'Email and Workplace Communication', difficulty: 'Intermediate', week: 4 },
+      { id: 'w4-05', word: 'Propose', partOfSpeech: 'verb', ipa: '/prəˈpoʊz/', meaningVi: 'Đề xuất giải pháp / kiến trúc', definitionEn: 'To put forward a plan for consideration.', exampleEn: 'I propose migrating to PostgreSQL cluster.', exampleVi: 'Tôi đề xuất di chuyển sang cụm PostgreSQL.', topic: 'Technical Meetings', difficulty: 'Beginner', week: 4 },
+      { id: 'w4-06', word: 'Trade-off', partOfSpeech: 'noun', ipa: '/ˈtreɪd ɔːf/', meaningVi: 'Sự đánh đổi trong thiết kế', definitionEn: 'A balance achieved between conflicting features.', exampleEn: 'Choosing NoSQL involves consistency trade-offs.', exampleVi: 'Chọn NoSQL đi kèm sự đánh đổi tính nhất quán.', topic: 'Problem-solving and Collaboration', difficulty: 'Intermediate', week: 4 },
+      { id: 'w4-07', word: 'Mitigate', partOfSpeech: 'verb', ipa: '/ˈmɪtɪɡeɪt/', meaningVi: 'Giảm thiểu rủi ro', definitionEn: 'To make something bad less severe.', exampleEn: 'We added rate limiting to mitigate DDoS attacks.', exampleVi: 'Chúng tôi thêm giới hạn tốc độ để giảm thiểu DDoS.', topic: 'Cybersecurity', difficulty: 'Intermediate', week: 4 },
+      { id: 'w4-08', word: 'Facilitate', partOfSpeech: 'verb', ipa: '/fəˈsɪlɪteɪt/', meaningVi: 'Tạo điều kiện, điều phối', definitionEn: 'To make a process easier.', exampleEn: 'Good API docs facilitate smooth integration.', exampleVi: 'Tài liệu API tốt tạo điều kiện tích hợp suôn sẻ.', topic: 'Problem-solving and Collaboration', difficulty: 'Intermediate', week: 4 },
+      { id: 'w4-09', word: 'High Availability', phrase: 'HA', partOfSpeech: 'noun', ipa: '/haɪ əˌveɪləˈbɪləti/', meaningVi: 'Độ sẵn sàng cao', definitionEn: 'Continuous operation without failure.', exampleEn: 'Our cloud architecture ensures high availability.', exampleVi: 'Kiến trúc cloud đảm bảo độ sẵn sàng cao.', topic: 'Cloud Computing and DevOps', difficulty: 'Intermediate', week: 4 },
+      { id: 'w4-10', word: 'Streamline', partOfSpeech: 'verb', ipa: '/ˈstriːmlaɪn/', meaningVi: 'Tinh gọn quy trình làm việc', definitionEn: 'To make a process more efficient.', exampleEn: 'We adopted CI/CD to streamline releases.', exampleVi: 'Chúng tôi áp dụng CI/CD để tinh gọn việc phát hành.', topic: 'Project Management', difficulty: 'Intermediate', week: 4 }
+    ];
+
+    // --- THUẬT TOÁN SPACED REPETITION (SM-2 CHUẨN) ---
+    function calculateNextReview(progress, rating, currentDateStr) {
+      let { repetition, easeFactor, interval, consecutiveCorrect } = progress;
+      let quality = 4;
+      if (rating === 'again') quality = 0;
+      else if (rating === 'hard') quality = 2;
+      else if (rating === 'good') quality = 4;
+      else if (rating === 'easy') quality = 5;
+
+      easeFactor = easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+      if (easeFactor < 1.3) easeFactor = 1.3;
+
+      let state = 'review';
+      if (quality < 3) {
+        repetition = 0;
+        interval = 1;
+        state = 'learning';
+        consecutiveCorrect = 0;
+      } else {
+        consecutiveCorrect += 1;
+        if (repetition === 0) {
+          interval = rating === 'hard' ? 1 : (rating === 'good' ? 1 : 3);
+        } else if (repetition === 1) {
+          interval = rating === 'hard' ? 3 : (rating === 'good' ? 6 : 10);
+        } else {
+          let multiplier = easeFactor;
+          if (rating === 'easy') multiplier *= 1.3;
+          if (rating === 'hard') multiplier *= 0.8;
+          interval = Math.round(interval * multiplier);
+        }
+        repetition += 1;
+        if (repetition >= 4) state = 'mastered';
+      }
+
+      const dueDateObj = new Date(currentDateStr);
+      dueDateObj.setDate(dueDateObj.getDate() + interval);
+      const dueDate = dueDateObj.toISOString().split('T')[0];
+
+      return {
+        ...progress,
+        repetition,
+        easeFactor: Number(easeFactor.toFixed(2)),
+        interval,
+        lastReviewed: currentDateStr,
+        dueDate,
+        state,
+        totalReviews: (progress.totalReviews || 0) + 1,
+        consecutiveCorrect
+      };
+    }
+
+    // --- MAIN REACT APPLICATION COMPONENT ---
+    function App() {
+      const [activeTab, setActiveTab] = useState('dashboard');
+      const [vocabulary, setVocabulary] = useState(INITIAL_VOCAB);
+      const [progressMap, setProgressMap] = useState({});
+      const [favourites, setFavourites] = useState([]);
+      const [stats, setStats] = useState({ streak: 1, totalStudyTimeSeconds: 300, sessionsCompleted: 1, quizScoresSum: 85, quizCount: 1 });
+      const [settings, setSettings] = useState({ dailyGoal: 10, studyTimeMinutes: 25 });
+      const [toast, setToast] = useState(null);
+
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      // Load LocalStorage on mount
+      useEffect(() => {
+        try {
+          const savedVocab = localStorage.getItem('it_vocab_pro_vocab');
+          const savedProg = localStorage.getItem('it_vocab_pro_prog');
+          const savedFav = localStorage.getItem('it_vocab_pro_fav');
+          const savedStats = localStorage.getItem('it_vocab_pro_stats');
+          const savedSets = localStorage.getItem('it_vocab_pro_settings');
+
+          if (savedVocab) setVocabulary(JSON.parse(savedVocab));
+          if (savedFav) setFavourites(JSON.parse(savedFav));
+          if (savedStats) setStats(JSON.parse(savedStats));
+          if (savedSets) setSettings(JSON.parse(savedSets));
+
+          if (savedProg) {
+            setProgressMap(JSON.parse(savedProg));
+          } else {
+            const initialMap = {};
+            INITIAL_VOCAB.forEach(v => {
+              initialMap[v.id] = {
+                wordId: v.id,
+                repetition: 0,
+                easeFactor: 2.5,
+                interval: 0,
+                lastReviewed: null,
+                dueDate: todayStr,
+                state: 'new',
+                totalReviews: 0,
+                consecutiveCorrect: 0
+              };
+            });
+            setProgressMap(initialMap);
+            localStorage.setItem('it_vocab_pro_prog', JSON.stringify(initialMap));
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }, []);
+
+      const showToastMsg = (msg) => {
+        setToast(msg);
+        setTimeout(() => setToast(null), 3000);
+      };
+
+      const updateWordProgress = (wordId, rating) => {
+        const current = progressMap[wordId] || {
+          wordId, repetition: 0, easeFactor: 2.5, interval: 0, lastReviewed: null, dueDate: todayStr, state: 'new', totalReviews: 0, consecutiveCorrect: 0
+        };
+        const updatedProg = calculateNextReview(current, rating, todayStr);
+        const newMap = { ...progressMap, [wordId]: updatedProg };
+        setProgressMap(newMap);
+        localStorage.setItem('it_vocab_pro_prog', JSON.stringify(newMap));
+      };
+
+      const toggleFav = (id) => {
+        const nextFav = favourites.includes(id) ? favourites.filter(i => i !== id) : [...favourites, id];
+        setFavourites(nextFav);
+        localStorage.setItem('it_vocab_pro_fav', JSON.stringify(nextFav));
+        showToastMsg(favourites.includes(id) ? 'Đã xóa khỏi yêu thích' : 'Đã thêm vào yêu thích');
+      };
+
+      useEffect(() => {
+        if (window.lucide) window.lucide.createIcons();
+      }, [activeTab, toast]);
+
+      return (
+        <div className="flex h-screen bg-slate-50 overflow-hidden">
+          {/* SIDEBAR */}
+          <aside className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 hidden md:flex">
+            <div className="p-6 border-b border-slate-100 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+                <i data-lucide="code-2" className="w-6 h-6"></i>
+              </div>
+              <div>
+                <h1 className="font-bold text-slate-900 text-base leading-tight">IT Vocab Pro</h1>
+                <span className="text-xs text-slate-500 font-medium">SaaS English for IT</span>
+              </div>
+            </div>
+
+            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+              {[
+                { id: 'dashboard', label: 'Tổng quan (Dashboard)', icon: 'layout-dashboard' },
+                { id: 'library', label: 'Kho từ vựng', icon: 'book-open' },
+                { id: 'plan', label: 'Lộ trình 4 tuần', icon: 'calendar-days' },
+                { id: 'study', label: 'Phòng học (Study)', icon: 'graduation-cap' },
+                { id: 'review', label: 'Ôn tập ngắt quãng', icon: 'rotate-ccw' },
+                { id: 'quiz', label: 'Luyện tập & Quiz', icon: 'help-circle' },
+                { id: 'analytics', label: 'Thống kê & Tiến độ', icon: 'bar-chart-3' },
+                { id: 'settings', label: 'Cài đặt hệ thống', icon: 'settings' },
+              ].map(item => {
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveTab(item.id)}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                      isActive ? 'bg-blue-50 text-blue-700 shadow-sm font-semibold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    }`}
+                  >
+                    <i data-lucide={item.icon} className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-slate-400'}`}></i>
+                    {item.label}
+                  </button>
+                );
+              })}
+            </nav>
+
+            <div className="p-4 border-t border-slate-100">
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                <p className="text-xs font-semibold text-slate-800">Software Engineer</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Trình độ: Trung cấp (B1-B2)</p>
+              </div>
+            </div>
+          </aside>
+
+          {/* MAIN CONTENT */}
+          <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+            {/* HEADER */}
+            <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0 z-20">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-slate-500">Mục tiêu:</span>
+                <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+                  IT Engineer • 20-30 phút/ngày
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full border border-amber-200/60 text-xs font-semibold">
+                  <i data-lucide="flame" className="w-4 h-4 text-amber-500 fill-amber-500"></i>
+                  <span>{stats.streak} ngày liên tiếp</span>
+                </div>
+                <div className="hidden sm:flex items-center gap-1.5 bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-xs font-semibold">
+                  <i data-lucide="clock" className="w-4 h-4 text-slate-500"></i>
+                  <span>{Math.round(stats.totalStudyTimeSeconds / 60)} phút học</span>
+                </div>
+              </div>
+            </header>
+
+            {/* VIEWS CONTAINER */}
+            <main className="flex-1 overflow-y-auto bg-slate-50">
+              {activeTab === 'dashboard' && <DashboardView vocabulary={vocabulary} progressMap={progressMap} setActiveTab={setActiveTab} todayStr={todayStr} />}
+              {activeTab === 'library' && <LibraryView vocabulary={vocabulary} setVocabulary={setVocabulary} favourites={favourites} toggleFav={toggleFav} showToastMsg={showToastMsg} />}
+              {activeTab === 'plan' && <PlanView vocabulary={vocabulary} progressMap={progressMap} setActiveTab={setActiveTab} />}
+              {activeTab === 'study' && <StudyView vocabulary={vocabulary} progressMap={progressMap} updateWordProgress={updateWordProgress} showToastMsg={showToastMsg} />}
+              {activeTab === 'review' && <ReviewView vocabulary={vocabulary} progressMap={progressMap} updateWordProgress={updateWordProgress} todayStr={todayStr} />}
+              {activeTab === 'quiz' && <QuizView vocabulary={vocabulary} stats={stats} setStats={setStats} />}
+              {activeTab === 'analytics' && <AnalyticsView vocabulary={vocabulary} progressMap={progressMap} stats={stats} />}
+              {activeTab === 'settings' && <SettingsView settings={settings} setSettings={setSettings} showToastMsg={showToastMsg} />}
+            </main>
+          </div>
+
+          {/* TOAST */}
+          {toast && (
+            <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700">
+              <i data-lucide="check-circle-2" className="w-5 h-5 text-emerald-400"></i>
+              <span className="text-sm font-medium">{toast}</span>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // --- SUB-VIEWS ---
+
+    // A. Dashboard View
+    function DashboardView({ vocabulary, progressMap, setActiveTab, todayStr }) {
+      const totalLearned = Object.values(progressMap).filter(p => p.state !== 'new').length;
+      const dueReviews = Object.values(progressMap).filter(p => p.dueDate <= todayStr && p.state !== 'new').length;
+      const masteredCount = Object.values(progressMap).filter(p => p.state === 'mastered').length;
+      const retention = totalLearned > 0 ? Math.round((masteredCount / totalLearned) * 100) : 0;
+
+      const attentionWords = vocabulary.filter(v => {
+        const p = progressMap[v.id];
+        return p && (p.state === 'learning' || p.easeFactor < 2.2);
+      }).slice(0, 4);
+
+      return (
+        <div className="p-8 max-w-7xl mx-auto space-y-8">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl shadow-blue-500/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <span className="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                Hôm nay: {new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              </span>
+              <h2 className="text-3xl font-bold mt-3">Chào mừng trở lại, Software Engineer!</h2>
+              <p className="text-blue-100 mt-2 max-w-xl text-sm leading-relaxed">
+                Tập trung nâng cao từ vựng chuyên ngành IT với ngân sách 20–30 phút mỗi ngày.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <button onClick={() => setActiveTab('study')} className="bg-white text-blue-700 px-6 py-3 rounded-xl font-semibold text-sm shadow-md hover:bg-blue-50 transition-all flex items-center gap-2">
+                <i data-lucide="play" className="w-4 h-4 fill-blue-700"></i> Bắt đầu học
+              </button>
+              <button onClick={() => setActiveTab('review')} className="bg-blue-500/50 border border-blue-400 text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-blue-500 transition-all flex items-center gap-2">
+                <i data-lucide="rotate-ccw" className="w-4 h-4"></i> Ôn tập ngay ({dueReviews})
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Số từ đã học</p>
+                <h3 className="text-2xl font-bold text-slate-900 mt-1">{totalLearned} / {vocabulary.length}</h3>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><i data-lucide="book-open" className="w-6 h-6"></i></div>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Cần ôn hôm nay</p>
+                <h3 className="text-2xl font-bold text-slate-900 mt-1">{dueReviews} từ</h3>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="rotate-ccw" className="w-6 h-6"></i></div>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tỷ lệ ghi nhớ</p>
+                <h3 className="text-2xl font-bold text-slate-900 mt-1">{retention}%</h3>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="award" className="w-6 h-6"></i></div>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Lộ trình 4 tuần</p>
+                <h3 className="text-2xl font-bold text-slate-900 mt-1">Tuần 1/4</h3>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center"><i data-lucide="calendar-days" className="w-6 h-6"></i></div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Từ vựng cần chú ý đặc biệt</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {attentionWords.map(word => (
+                <div key={word.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col justify-between">
+                  <div>
+                    <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{word.topic}</span>
+                    <h4 className="font-bold text-slate-900 text-base mt-2">{word.word}</h4>
+                    <p className="text-xs text-slate-600 mt-1">{word.meaningVi}</p>
+                  </div>
+                  <button onClick={() => setActiveTab('study')} className="mt-4 text-xs font-semibold text-blue-600 hover:underline text-left">Học ngay →</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // B. Vocabulary Library View
+    function LibraryView({ vocabulary, setVocabulary, favourites, toggleFav, showToastMsg }) {
+      const [searchTerm, setSearchTerm] = useState('');
+      const [selectedTopic, setSelectedTopic] = useState('All');
+      const topics = ['All', ...Array.from(new Set(vocabulary.map(v => v.topic)))];
+
+      const filtered = vocabulary.filter(v => {
+        const matches = v.word.toLowerCase().includes(searchTerm.toLowerCase()) || v.meaningVi.toLowerCase().includes(searchTerm.toLowerCase());
+        const topicMatch = selectedTopic === 'All' || v.topic === selectedTopic;
+        return matches && topicMatch;
+      });
+
+      return (
+        <div className="p-8 max-w-7xl mx-auto space-y-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900">Kho từ vựng chuyên ngành IT</h2>
+              <p className="text-sm text-slate-500 mt-1">Tra cứu nhanh toàn bộ 40 từ vựng cốt lõi</p>
+            </div>
+            <div className="flex gap-3 w-full md:w-auto">
+              <input type="text" placeholder="Tìm kiếm từ vựng..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 w-full md:w-64" />
+              <select value={selectedTopic} onChange={e => setSelectedTopic(e.target.value)} className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                {topics.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map(item => {
+              const isFav = favourites.includes(item.id);
+              return (
+                <div key={item.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full">{item.topic}</span>
+                      <button onClick={() => toggleFav(item.id)} className={`p-1.5 rounded-lg hover:bg-slate-100 ${isFav ? 'text-rose-500' : 'text-slate-300'}`}>
+                        <i data-lucide="heart" className={`w-4 h-4 ${isFav ? 'fill-rose-500' : ''}`}></i>
+                      </button>
+                    </div>
+                    <div className="mt-4">
+                      <div className="flex items-baseline gap-2">
+                        <h3 className="text-lg font-bold text-slate-900">{item.word}</h3>
+                        <span className="text-xs text-slate-400 italic">({item.partOfSpeech})</span>
+                        <span className="text-xs text-slate-500 font-mono">{item.ipa}</span>
+                      </div>
+                      <p className="text-sm font-medium text-slate-800 mt-1">{item.meaningVi}</p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-slate-100 space-y-1">
+                      <p className="text-xs text-slate-600 italic">"{item.exampleEn}"</p>
+                      <p className="text-xs text-slate-500">{item.exampleVi}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                    <span>Tuần {item.week}</span>
+                    <span className="font-semibold px-2 py-0.5 bg-slate-100 rounded text-slate-700">{item.difficulty}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // C. Learning Plan View
+    function PlanView({ vocabulary, progressMap, setActiveTab }) {
+      const [selectedWeek, setSelectedWeek] = useState(1);
+      const weeks = [
+        { week: 1, title: 'Nền tảng giao tiếp công việc và phát triển phần mềm' },
+        { week: 2, title: 'Công cụ, quy trình phát triển và phối hợp nhóm' },
+        { week: 3, title: 'Hệ thống, API, dữ liệu và xử lý lỗi' },
+        { week: 4, title: 'Giao tiếp chuyên nghiệp và ứng dụng tổng hợp' },
+      ];
+      const weekWords = vocabulary.filter(v => v.week === selectedWeek);
+
+      return (
+        <div className="p-8 max-w-7xl mx-auto space-y-8">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Lộ trình học tập 4 tuần</h2>
+            <p className="text-sm text-slate-500 mt-1">Chương trình chuẩn hóa cho kỹ sư IT trung cấp (B1–B2), 10 từ mỗi tuần</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {weeks.map(w => (
+              <div key={w.week} onClick={() => setSelectedWeek(w.week)} className={`p-5 rounded-2xl border cursor-pointer transition-all ${selectedWeek === w.week ? 'bg-blue-50 border-blue-500 shadow-sm' : 'bg-white border-slate-200'}`}>
+                <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${selectedWeek === w.week ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}>Tuần {w.week}</span>
+                <h4 className="font-bold text-slate-900 text-sm mt-3">{w.title}</h4>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+              <h3 className="text-lg font-bold text-slate-900">Danh sách từ vựng tuần {selectedWeek}</h3>
+              <button onClick={() => setActiveTab('study')} className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow">Học tuần này →</button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {weekWords.map(word => {
+                const p = progressMap[word.id];
+                const learned = p && p.state !== 'new';
+                return (
+                  <div key={word.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex justify-between items-center">
+                    <div>
+                      <h5 className="font-bold text-slate-900 text-sm">{word.word} <span className="font-normal text-xs text-slate-400">{word.ipa}</span></h5>
+                      <p className="text-xs text-slate-600">{word.meaningVi}</p>
+                    </div>
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${learned ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-200 text-slate-600'}`}>
+                      {learned ? 'Đã học' : 'Chưa học'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // D. Study Session (Flashcard) View
+    function StudyView({ vocabulary, progressMap, updateWordProgress, showToastMsg }) {
+      const studyQueue = vocabulary.filter(v => {
+        const p = progressMap[v.id];
+        return !p || p.state === 'new' || p.state === 'learning';
+      });
+
+      const [currentIndex, setCurrentIndex] = useState(0);
+      const [isFlipped, setIsFlipped] = useState(false);
+      const [finished, setFinished] = useState(false);
+
+      const currentWord = studyQueue[currentIndex];
+
+      const handleRating = (rating) => {
+        if (!currentWord) return;
+        updateWordProgress(currentWord.id, rating);
+        setIsFlipped(false);
+        if (currentIndex + 1 < studyQueue.length) {
+          setCurrentIndex(currentIndex + 1);
+        } else {
+          setFinished(true);
+          showToastMsg('Hoàn thành phiên học xuất sắc!');
+        }
+      };
+
+      const playAudio = () => {
+        if ('speechSynthesis' in window && currentWord) {
+          const u = new SpeechSynthesisUtterance(currentWord.word);
+          u.lang = 'en-US';
+          window.speechSynthesis.speak(u);
+        }
+      };
+
+      if (studyQueue.length === 0 || finished) {
+        return (
+          <div className="p-8 max-w-xl mx-auto text-center space-y-6 mt-12 bg-white rounded-3xl border border-slate-200 shadow-sm p-12">
+            <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto"><i data-lucide="check-circle-2" className="w-8 h-8"></i></div>
+            <h2 className="text-2xl font-bold text-slate-900">Hoàn thành phiên học!</h2>
+            <p className="text-slate-500 text-sm">Bạn đã hoàn thành các từ mới và từ cần học hôm nay.</p>
+            <button onClick={() => { setFinished(false); setCurrentIndex(0); }} className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm shadow">Học tiếp phiên mới</button>
+          </div>
+        );
+      }
+
+      return (
+        <div className="p-8 max-w-xl mx-auto space-y-6">
+          <div className="flex justify-between text-xs font-semibold text-slate-500">
+            <span>Tiến độ phiên học</span>
+            <span>Từ {currentIndex + 1} / {studyQueue.length}</span>
+          </div>
+
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-8 min-h-[400px] flex flex-col justify-between">
+            <div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">{currentWord.topic}</span>
+                <button onClick={playAudio} className="p-2 rounded-xl bg-slate-100 text-slate-700 flex items-center gap-1.5 text-xs font-semibold hover:bg-slate-200">
+                  <i data-lucide="volume-2" className="w-4 h-4 text-blue-600"></i> Phát âm
+                </button>
+              </div>
+
+              <div className="mt-8 text-center">
+                <h3 className="text-4xl font-extrabold text-slate-900">{currentWord.word}</h3>
+                <p className="text-sm text-slate-400 mt-1 font-mono">{currentWord.ipa}</p>
+              </div>
+
+              {isFlipped && (
+                <div className="mt-6 pt-6 border-t border-slate-100 space-y-4 animate-fade-in">
+                  <div>
+                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Nghĩa tiếng Việt</span>
+                    <p className="text-base font-bold text-slate-900">{currentWord.meaningVi}</p>
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Ví dụ công việc IT</span>
+                    <p className="text-xs text-slate-700 italic">"{currentWord.exampleEn}"</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{currentWord.exampleVi}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-8 pt-4 border-t border-slate-100">
+              {!isFlipped ? (
+                <button onClick={() => setIsFlipped(true)} className="w-full bg-slate-900 text-white py-3.5 rounded-xl font-semibold text-sm shadow hover:bg-slate-800">
+                  Hiển thị đáp án
+                </button>
+              ) : (
+                <div>
+                  <p className="text-center text-xs font-semibold text-slate-500 mb-3">Đánh giá mức độ ghi nhớ:</p>
+                  <div className="grid grid-cols-4 gap-2">
+                    <button onClick={() => handleRating('again')} className="py-2.5 bg-rose-50 text-rose-700 rounded-xl text-xs font-bold border border-rose-200">Quên</button>
+                    <button onClick={() => handleRating('hard')} className="py-2.5 bg-amber-50 text-amber-700 rounded-xl text-xs font-bold border border-amber-200">Khó</button>
+                    <button onClick={() => handleRating('good')} className="py-2.5 bg-blue-50 text-blue-700 rounded-xl text-xs font-bold border border-blue-200">Nhớ</button>
+                    <button onClick={() => handleRating('easy')} className="py-2.5 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold border border-emerald-200">Dễ</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // E. Review Center View
+    function ReviewView({ vocabulary, progressMap, updateWordProgress, todayStr }) {
+      const dueItems = vocabulary.filter(v => {
+        const p = progressMap[v.id];
+        return p && p.dueDate <= todayStr && p.state !== 'new';
+      });
+
+      const [currentIndex, setCurrentIndex] = useState(0);
+      const [showAns, setShowAns] = useState(false);
+      const currentWord = dueItems[currentIndex];
+
+      const handleRating = (rating) => {
+        if (!currentWord) return;
+        updateWordProgress(currentWord.id, rating);
+        setShowAns(false);
+      };
+
+      if (dueItems.length === 0 || !currentWord) {
+        return (
+          <div className="p-8 max-w-xl mx-auto text-center space-y-6 mt-12 bg-white rounded-3xl border border-slate-200 shadow-sm p-12">
+            <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto"><i data-lucide="check-circle-2" className="w-8 h-8"></i></div>
+            <h2 className="text-2xl font-bold text-slate-900">Không có từ nào đến hạn ôn!</h2>
+            <p className="text-slate-500 text-sm">Tuyệt vời, bạn đã hoàn thành lịch ôn tập ngắt quãng hôm nay.</p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="p-8 max-w-xl mx-auto space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-slate-900">Ôn tập ngắt quãng (SM-2)</h2>
+            <span className="text-xs font-semibold bg-amber-50 text-amber-700 px-3 py-1 rounded-full border border-amber-200">Còn {dueItems.length} từ đến hạn</span>
+          </div>
+
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-8 space-y-6">
+            <div className="text-center py-4">
+              <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">{currentWord.topic}</span>
+              <h3 className="text-4xl font-extrabold text-slate-900 mt-4">{currentWord.word}</h3>
+              <p className="text-sm text-slate-400 mt-1 font-mono">{currentWord.ipa}</p>
+            </div>
+
+            {showAns && (
+              <div className="space-y-3 pt-4 border-t border-slate-100 animate-fade-in">
+                <div>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase">Nghĩa tiếng Việt</span>
+                  <p className="text-base font-bold text-slate-900">{currentWord.meaningVi}</p>
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase">Ví dụ</span>
+                  <p className="text-xs text-slate-700 italic">"{currentWord.exampleEn}"</p>
+                </div>
+              </div>
+            )}
+
+            <div className="pt-4 border-t border-slate-100">
+              {!showAns ? (
+                <button onClick={() => setShowAns(true)} className="w-full bg-slate-900 text-white py-3.5 rounded-xl font-semibold text-sm shadow hover:bg-slate-800">
+                  Hiển thị đáp án ôn tập
+                </button>
+              ) : (
+                <div className="grid grid-cols-4 gap-2">
+                  <button onClick={() => handleRating('again')} className="py-2.5 bg-rose-50 text-rose-700 rounded-xl text-xs font-bold border border-rose-200">Again</button>
+                  <button onClick={() => handleRating('hard')} className="py-2.5 bg-amber-50 text-amber-700 rounded-xl text-xs font-bold border border-amber-200">Hard</button>
+                  <button onClick={() => handleRating('good')} className="py-2.5 bg-blue-50 text-blue-700 rounded-xl text-xs font-bold border border-blue-200">Good</button>
+                  <button onClick={() => handleRating('easy')} className="py-2.5 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold border border-emerald-200">Easy</button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // F. Quiz & Practice View
+    function QuizView({ vocabulary, stats, setStats }) {
+      const [questions] = useState(() => {
+        const shuffled = [...vocabulary].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, 5).map(item => {
+          const distractors = vocabulary.filter(v => v.id !== item.id).sort(() => 0.5 - Math.random()).slice(0, 3).map(v => v.meaningVi);
+          const options = [...distractors, item.meaningVi].sort(() => 0.5 - Math.random());
+          return { word: item.word, correctMeaning: item.meaningVi, options, example: item.exampleEn };
+        });
+      });
+
+      const [currentIndex, setCurrentIndex] = useState(0);
+      const [selected, setSelected] = useState(null);
+      const [score, setScore] = useState(0);
+      const [finished, setFinished] = useState(false);
+
+      const q = questions[currentIndex];
+
+      const handleSelect = (opt) => {
+        if (selected !== null) return;
+        setSelected(opt);
+        if (opt === q.correctMeaning) setScore(score + 1);
+      };
+
+      const handleNext = () => {
+        if (currentIndex + 1 < questions.length) {
+          setCurrentIndex(currentIndex + 1);
+          setSelected(null);
+        } else {
+          setFinished(true);
+        }
+      };
+
+      if (finished) {
+        return (
+          <div className="p-8 max-w-xl mx-auto text-center space-y-6 mt-12 bg-white rounded-3xl border border-slate-200 shadow-sm p-12">
+            <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto"><i data-lucide="award" className="w-8 h-8"></i></div>
+            <h2 className="text-2xl font-bold text-slate-900">Kết quả Quiz</h2>
+            <p className="text-3xl font-extrabold text-blue-600">{score} / {questions.length} câu đúng</p>
+            <button onClick={() => window.location.reload()} className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm shadow">Làm bài mới</button>
+          </div>
+        );
+      }
+
+      return (
+        <div className="p-8 max-w-xl mx-auto space-y-6">
+          <div className="flex justify-between text-xs font-semibold text-slate-500">
+            <span>Trắc nghiệm nghĩa từ</span>
+            <span>Câu {currentIndex + 1} / {questions.length}</span>
+          </div>
+
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-8 space-y-6">
+            <div>
+              <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Chọn nghĩa chính xác</span>
+              <h3 className="text-3xl font-extrabold text-slate-900 mt-4">{q.word}</h3>
+              <p className="text-xs text-slate-500 italic mt-1">Ví dụ: "{q.example}"</p>
+            </div>
+
+            <div className="space-y-3">
+              {q.options.map((opt, i) => {
+                let btnStyle = "bg-slate-50 border-slate-200 text-slate-800 hover:border-blue-300";
+                if (selected !== null) {
+                  if (opt === q.correctMeaning) btnStyle = "bg-emerald-50 border-emerald-500 text-emerald-800 font-semibold";
+                  else if (opt === selected) btnStyle = "bg-rose-50 border-rose-500 text-rose-800";
+                }
+                return (
+                  <button key={i} onClick={() => handleSelect(opt)} className={`w-full text-left p-4 rounded-xl border transition-all text-sm flex justify-between items-center ${btnStyle}`}>
+                    <span>{opt}</span>
+                    {selected !== null && opt === q.correctMeaning && <i data-lucide="check-circle-2" className="w-5 h-5 text-emerald-600"></i>}
+                  </button>
+                );
+              })}
+            </div>
+
+            {selected !== null && (
+              <div className="pt-4 border-t border-slate-100 flex justify-end">
+                <button onClick={handleNext} className="bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-semibold shadow">Tiếp theo →</button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // G. Analytics View
+    function AnalyticsView({ vocabulary, progressMap, stats }) {
+      const totalLearned = Object.values(progressMap).filter(p => p.state !== 'new').length;
+      const mastered = Object.values(progressMap).filter(p => p.state === 'mastered').length;
+
+      return (
+        <div className="p-8 max-w-7xl mx-auto space-y-8">
+          <h2 className="text-2xl font-bold text-slate-900">Thống kê & Đánh giá tiến độ</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+              <p className="text-xs font-semibold text-slate-500 uppercase">Tổng thời gian học</p>
+              <h3 className="text-2xl font-bold text-slate-900 mt-2">{Math.round(stats.totalStudyTimeSeconds / 60)} phút</h3>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+              <p className="text-xs font-semibold text-slate-500 uppercase">Chuỗi ngày học</p>
+              <h3 className="text-2xl font-bold text-slate-900 mt-2">{stats.streak} ngày</h3>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+              <p className="text-xs font-semibold text-slate-500 uppercase">Đã thành thạo</p>
+              <h3 className="text-2xl font-bold text-slate-900 mt-2">{mastered} / {vocabulary.length} từ</h3>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // H. Settings View
+    function SettingsView({ settings, setSettings, showToastMsg }) {
+      const [goal, setGoal] = useState(settings.dailyGoal);
+
+      const handleSave = (e) => {
+        e.preventDefault();
+        setSettings({ ...settings, dailyGoal: goal });
+        localStorage.setItem('it_vocab_pro_settings', JSON.stringify({ ...settings, dailyGoal: goal }));
+        showToastMsg('Đã lưu cài đặt thành công!');
+      };
+
+      return (
+        <div className="p-8 max-w-3xl mx-auto space-y-8">
+          <h2 className="text-2xl font-bold text-slate-900">Cài đặt hệ thống</h2>
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <form onSubmit={handleSave} className="space-y-6">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-2">Mục tiêu từ mới mỗi ngày</label>
+                <input type="number" min={5} max={30} value={goal} onChange={e => setGoal(Number(e.target.value))} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div className="flex justify-end pt-4 border-t border-slate-100">
+                <button type="submit" className="bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-semibold shadow">Lưu thay đổi</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>-
